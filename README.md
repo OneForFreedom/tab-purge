@@ -1,4 +1,5 @@
 # Tab Purge
+
 You're a digital warrior.
 Your tabs? Out of control.
 Your CPU? Screaming.
