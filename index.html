@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tab Purge 🔥</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: white;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #tab-bar {
+      display: flex;
+      overflow-x: auto;
+      background: #1a1a1a;
+      width: 100%;
+      padding: 10px;
+      border-bottom: 2px solid #333;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .tab {
+      background: #2b2b2b;
+      border: 2px solid #444;
+      padding: 5px 10px;
+      border-radius: 5px 5px 0 0;
+      margin-right: 5px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .tab:hover {
+      background: #3a3a3a;
+    }
+
+    .tab span {
+      margin-right: 8px;
+    }
+
+    .tab button {
+      background: transparent;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    h1 {
+      margin: 20px 0 10px;
+      z-index: 1;
+    }
+
+    #score, #timer {
+      font-size: 18px;
+      margin: 5px 0;
+    }
+
+    #game-over {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      display: none;
+      z-index: 999;
+    }
+
+    #restart {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #28a745;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="tab-bar"></div>
+  <h1>TAB PURGE 🔥</h1>
+  <div id="score">Score: 0</div>
+  <div id="timer">Time Left: 180s</div>
+
+  <div id="game-over">
+    <div>🛑 Game Over! Final Score: <span id="final-score"></span></div>
+    <button id="restart">Restart</button>
+  </div>
+
+  <audio id="success-sound" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
+  <audio id="fail-sound" src="https://freesound.org/data/previews/256/256114_3263906-lq.mp3"></audio>
+
+  <script>
+    const tabBar = document.getElementById("tab-bar");
+    const scoreDisplay = document.getElementById("score");
+    const timerDisplay = document.getElementById("timer");
+    const gameOverScreen = document.getElementById("game-over");
+    const finalScoreDisplay = document.getElementById("final-score");
+    const restartBtn = document.getElementById("restart");
+    const successSound = document.getElementById("success-sound");
+    const failSound = document.getElementById("fail-sound");
+
+    const goodTabs = [
+  "Free V-Bucks Now",
+  "Robux Generator",
+  "Download GTA 6 Beta",
+  "Click For iPhone 16",
+  "123Movies Unblocked",
+  "Hot Singles Near You",
+  "Cracked Software Download",
+  "Free Fortnite Skins",
+  "TikTok Clickbait",
+  "Win PS5 Instantly",
+  "Key Logger",
+  "Instantphsising.net",
+  "The Trap House",
+  "Hire A Hitman",
+  "Underage drinking",
+  "The Black Market",
+  "Unhinged Lawyers",
+  "Fake a suicide.net",
+  "Killing for fun.net",
+  "Kidnap Simulator",
+  "Order Fake Passport",
+  "Cheat On Your Test",
+  "Ransomware Tutorial",
+  "Sneak Into Airport",
+  "Illegal Weapons for sale",
+  "BombMaking101.org",
+  "Kidnap Chatroom",
+  "How To Join Mafia",
+  "How to Harvest Organs",
+  "Date A Prisoner",
+  "Satanic Ritual Live",
+  "Curse Generator",
+  "Download Paid Mods Free",
+  "Crypto Scam Secrets",
+  "Doxxing Tool",
+  "Hacking For Beginners",
+  "Child Labour Deals",
+  "Human Trafficking Market",
+  "ExploitBankAccounts.com",
+  "Deep Web Login",
+  "Set Up Dark Web Shop",
+  "Poison Recipes",
+  "Black Hat Hackers Club",
+  "School Shooter Sim",
+  "How To Evade FBI",
+  "Bulletproof Your House",
+  "Hitman Pricing Calculator",
+  "BurnDownBuilding.info",
+  "Real Torture Sounds",
+  "Watch Real Death Videos"
+    ];
+
+    const badTabs = [
+  "summer.hackclub.com",
+  "Khan Academy",
+  "Duolingo",
+  "Seneca Learning",
+  "National Geographic",
+  "Oxford Dictionary",
+  "Google Classroom",
+  "MyMaths",
+  "Code.org",
+  "NASA For Students",
+  "TED Talks Education",
+  "Coursera",
+  "EdX",
+  "BBC News (Education)",
+  "TypingClub",
+  "British Museum Virtual Tour",
+  "Online Quran Explorer",
+  "Prayer Times Checker",
+  "Mental Health Support UK",
+  "Cyberbullying Helpline",
+  "NHS Youth",
+  "Natural History Museum",
+  "TheSchoolRun",
+  "University Finder",
+  "Scholarship Guide",
+  "LinkedIn Learning",
+  "Cambridge Assessment",
+  "Quizlet",
+  "GOV.UK Careers",
+  "StudyBlue",
+  "Google Scholar",
+  "National Careers Service",
+  "Learn Python",
+  "Scratch Programming",
+  "Online CV Builder",
+  "Student Finance Calculator",
+  "STEM Learning UK",
+  "Bristol Uni Virtual Open Day",
+  "Imperial Maths Support",
+  "LearnWithBBC.co.uk",
+  "Virtual Science Lab",
+  "School Email",
+  "Past Paper Archive",
+  "AQA Official Website",
+  "Edexcel Revision",
+  "Save The Children UK",
+  "Charity Navigator",
+  "GoodReads For Teens",
+  "BookTrust",
+  "NobelPrize.org"
+]
+
+    
+    const allTabs = [
+      ...goodTabs.map(name => ({ title: name, isGood: true })),
+      ...badTabs.map(name => ({ title: name, isGood: false }))
+    ];
+
+    let score = 0;
+    let timeLeft = 180;
+    let interval;
+    let goodClicks = 0;
+
+    function createTab(tabData) {
+      const tab = document.createElement("div");
+      tab.className = "tab";
+      tab.innerHTML = `<span>${tabData.title}</span><button>x</button>`;
+
+      const timeoutId = setTimeout(() => {
+        if (tabBar.contains(tab)) tab.remove();
+      }, 10000);
+
+      tab.querySelector("button").addEventListener("click", () => {
+        clearTimeout(timeoutId);
+        handleClick(tab, tabData);
+      });
+
+      tabBar.appendChild(tab);
+    }
+
+    function handleClick(tabElement, tabData) {
+      if (tabData.isGood) {
+        score++;
+        goodClicks++;
+        successSound.play();
+        if (goodClicks % 5 === 0) timeLeft += 10;
+      } else {
+        score -= 2;
+        timeLeft -= 10;
+        failSound.play();
+      }
+      tabElement.remove();
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      scoreDisplay.textContent = `Score: ${score}`;
+      timerDisplay.textContent = `Time Left: ${timeLeft}s`;
+    }
+
+    function addRandomTab() {
+      const randomTab = allTabs[Math.floor(Math.random() * allTabs.length)];
+      createTab(randomTab);
+    }
+
+    function startTimer() {
+      interval = setInterval(() => {
+        timeLeft--;
+        updateDisplay();
+        if (timeLeft % 3 === 0) addRandomTab();
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      finalScoreDisplay.textContent = score;
+      gameOverScreen.style.display = "flex";
+    }
+
+    restartBtn.addEventListener("click", () => {
+      location.reload();
+    });
+
+    startTimer();
+    for (let i = 0; i < 4; i++) addRandomTab();
+  </script>
+</body>
+</html>
+
+  // Why u lookin' through my code broda?
